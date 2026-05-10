@@ -13,7 +13,7 @@ export const auth = betterAuth({
 			verification: schema.verification,
 		},
 	}),
-	secret: process.env.BETTER_AUTH_SECRET,
+	secret: process.env.BETTER_AUTH_SECRET || "fallback-secret-for-development-only-12345678",
 	baseURL: process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
 	session: {
 		strategy: "jwt",
@@ -26,12 +26,10 @@ export const auth = betterAuth({
 		google: {
 			clientId: process.env.GOOGLE_CLIENT_ID || "google_id",
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET || "google_secret",
-			enabled: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
 		},
 		github: {
 			clientId: process.env.GITHUB_CLIENT_ID || "github_id",
 			clientSecret: process.env.GITHUB_CLIENT_SECRET || "github_secret",
-			enabled: !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET),
 		},
 	},
 	user: {
@@ -43,5 +41,6 @@ export const auth = betterAuth({
 			},
 		},
 	},
+    plugins: [],
 	trustedOrigins: [process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"],
 });
