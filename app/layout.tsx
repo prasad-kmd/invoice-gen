@@ -2,10 +2,23 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const localInter = localFont({
   src: "../public/fonts/Inter-Regular.woff2",
   variable: "--font-inter",
+  display: "swap",
+});
+
+const googleSans = localFont({
+  src: "../public/fonts/GoogleSans-Regular.woff2",
+  variable: "--font-google-sans",
+  display: "swap",
+});
+
+const jetbrainsMono = localFont({
+  src: "../public/fonts/JetBrainsMono-Regular.woff2",
+  variable: "--font-jetbrains-mono",
   display: "swap",
 });
 
@@ -20,10 +33,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={localInter.variable}>
+    <html lang="en" suppressHydrationWarning className={`${localInter.variable} ${googleSans.variable} ${jetbrainsMono.variable}`}>
       <body className="antialiased">
-        {children}
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
