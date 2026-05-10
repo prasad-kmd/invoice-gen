@@ -2,7 +2,8 @@ import { Document, Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 // Register fonts
-// We need absolute URLs for fonts when rendering on the server
+// Using .woff instead of .woff2 because @react-pdf/renderer has better support for it
+// and ensured absolute URLs are correct.
 const fontBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 Font.register({
