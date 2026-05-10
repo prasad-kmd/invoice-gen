@@ -1,27 +1,9 @@
 import { Document, Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
-// In @react-pdf/renderer, when running in the browser,
-// we should ideally use URLs for fonts.
-// However, since we are doing local fonts only and this is also used on server-side
-// for generation (if any), we need to be careful.
-// To keep it simple and working in both environments without Node.js modules:
-const FONT_BASE_URL = typeof window !== "undefined"
-    ? window.location.origin
-    : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-
-Font.register({
-  family: "Inter",
-  src: `${FONT_BASE_URL}/fonts/Inter-Regular.woff`,
-});
-
-Font.register({
-  family: "GoogleSans",
-  fonts: [
-    { src: `${FONT_BASE_URL}/fonts/GoogleSans-Regular.woff` },
-    { src: `${FONT_BASE_URL}/fonts/GoogleSans-Regular.woff`, fontWeight: "bold" },
-  ],
-});
+// react-pdf has issues with some WOFF files.
+// Standard Helvetica doesn't require registration and is reliable.
+// To keep it premium, we use clean layouts and Teal accent.
 
 const ACCENT_COLOR = "#0D9488"; // Teal/Cyan color
 
@@ -29,7 +11,7 @@ const styles = StyleSheet.create({
 	page: {
 		padding: 40,
 		fontSize: 10,
-		fontFamily: "Inter",
+		fontFamily: "Helvetica",
 		color: "#374151",
         position: "relative",
 	},
@@ -62,7 +44,6 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: "bold",
 		color: "#111827",
-        fontFamily: "GoogleSans",
 	},
 	invoiceTitleContainer: {
 		textAlign: "right",
@@ -72,7 +53,6 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 		color: ACCENT_COLOR,
 		textTransform: "uppercase",
-        fontFamily: "GoogleSans",
         letterSpacing: 1,
 	},
 	invoiceDetails: {
@@ -88,14 +68,12 @@ const styles = StyleSheet.create({
 		color: "#9CA3AF",
 		textTransform: "uppercase",
 		marginBottom: 6,
-        fontFamily: "GoogleSans",
 	},
 	clientName: {
 		fontSize: 12,
 		fontWeight: "bold",
 		color: "#111827",
 		marginBottom: 3,
-        fontFamily: "GoogleSans",
 	},
 	table: {
 		marginTop: 10,
@@ -107,7 +85,6 @@ const styles = StyleSheet.create({
 		borderColor: ACCENT_COLOR,
 		padding: 8,
 		fontWeight: "bold",
-        fontFamily: "GoogleSans",
         color: "#111827",
 	},
 	tableRow: {
@@ -148,14 +125,12 @@ const styles = StyleSheet.create({
 	totalLabel: {
 		fontSize: 14,
 		fontWeight: "bold",
-        fontFamily: "GoogleSans",
         color: "#111827",
 	},
 	totalValue: {
 		fontSize: 14,
 		fontWeight: "bold",
 		color: ACCENT_COLOR,
-        fontFamily: "GoogleSans",
 	},
 	footer: {
 		position: "absolute",
@@ -228,7 +203,7 @@ export function InvoicePDF({ business, client, invoice }: any) {
 					{invoice.items.map((item: any, index: number) => (
 						<View key={index} style={styles.tableRow} wrap={false}>
 							<Text style={styles.col1}>{String(index + 1).padStart(2, '0')}</Text>
-							<Text style={[styles.col2, { color: "#111827", fontWeight: "medium" }]}>{item.description}</Text>
+							<Text style={[styles.col2, { color: "#111827" }]}>{item.description}</Text>
 							<Text style={styles.col3}>{item.quantity}</Text>
 							<Text style={styles.col4}>{formatCurrency(item.unitPrice, currency)}</Text>
 							<Text style={[styles.col5, { fontWeight: "bold", color: "#111827" }]}>{formatCurrency(item.totalPrice, currency)}</Text>

@@ -3,7 +3,7 @@
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { InvoicePDF } from "./invoice-pdf";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function PDFDownloadButton({ business, client, invoice }: any) {
@@ -15,9 +15,9 @@ export function PDFDownloadButton({ business, client, invoice }: any) {
 
 	if (!isClient) {
 		return (
-			<Button className="bg-blue-600 hover:bg-blue-700" disabled>
-				<Download className="mr-2 h-4 w-4" />
-				Loading PDF...
+			<Button variant="outline" disabled>
+				<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+				Preparing...
 			</Button>
 		);
 	}
@@ -28,8 +28,12 @@ export function PDFDownloadButton({ business, client, invoice }: any) {
 			fileName={`${invoice.invoiceNumber}.pdf`}
 		>
 			{({ loading }: any) => (
-				<Button className="bg-blue-600 hover:bg-blue-700" disabled={loading}>
-					<Download className="mr-2 h-4 w-4" />
+				<Button disabled={loading} className="shadow-lg shadow-primary/20">
+					{loading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                        <Download className="mr-2 h-4 w-4" />
+                    )}
 					{loading ? "Generating..." : "Download PDF"}
 				</Button>
 			)}
