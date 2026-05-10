@@ -17,6 +17,8 @@ const settingsSchema = z.object({
 	defaultTaxRate: z.number().min(0),
 	invoicePrefix: z.string().min(1),
 	invoicePadding: z.number().min(1),
+    currency: z.string().min(1),
+    showPageBorder: z.boolean(),
 });
 
 export async function getSettings(userId: string) {
@@ -46,4 +48,5 @@ export async function updateSettings(userId: string, data: z.infer<typeof settin
 
 	revalidatePath("/settings");
 	revalidatePath("/invoices");
+    revalidatePath("/dashboard");
 }

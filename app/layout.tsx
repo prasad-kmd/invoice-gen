@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const localInter = localFont({
   src: "../public/fonts/Inter-Regular.woff2",
@@ -9,9 +10,15 @@ const localInter = localFont({
   display: "swap",
 });
 
+const googleSans = localFont({
+  src: "../public/fonts/GoogleSans-Regular.woff2",
+  variable: "--font-google-sans",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "PC Repair Invoice Generator",
-  description: "General-purpose invoice generator for PC repair technicians",
+  title: "Invoice Pro | Professional Invoice Generator",
+  description: "Modern, fast, and professional invoice generator for businesses and freelancers.",
 };
 
 export default function RootLayout({
@@ -20,10 +27,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={localInter.variable}>
-      <body className="antialiased">
-        {children}
-        <Toaster />
+    <html lang="en" suppressHydrationWarning className={`${localInter.variable} ${googleSans.variable}`}>
+      <body className="antialiased font-inter">
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+          {children}
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

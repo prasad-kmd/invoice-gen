@@ -98,6 +98,7 @@ export const invoices = pgTable("invoices", {
 	totalAmount: doublePrecision("total_amount").notNull(),
 	customNotes: text("custom_notes"),
 	paymentTerms: text("payment_terms"),
+    currency: text("currency").default("LKR").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
@@ -135,4 +136,6 @@ export const businessSettings = pgTable("business_settings", {
 	invoicePrefix: text("invoice_prefix").default("INV-").notNull(),
 	nextInvoiceNumber: integer("next_invoice_number").default(1).notNull(),
 	invoicePadding: integer("invoice_padding").default(4).notNull(),
+    currency: text("currency").default("LKR").notNull(),
+    showPageBorder: boolean("show_page_border").default(true).notNull(),
 });
