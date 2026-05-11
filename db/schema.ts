@@ -135,4 +135,5 @@ export const businessSettings = pgTable("business_settings", {
 	invoicePrefix: text("invoice_prefix").default("INV-").notNull(),
 	nextInvoiceNumber: integer("next_invoice_number").default(1).notNull(),
 	invoicePadding: integer("invoice_padding").default(4).notNull(),
+	currency: text("currency").default("LKR").notNull(),
 });

@@ -2,15 +2,9 @@
 
 import { usePathname } from "next/navigation";
 import {
-  FileText,
-  Menu,
-  X,
-  Search,
-  Settings,
   Plus,
-  Home,
-  Users,
-  LogOut
+  LogOut,
+  Palette
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -22,6 +16,8 @@ import {
 } from "@/components/ui/tooltip";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { useAccentColor } from "@/hooks/use-accent-color";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function FloatingNavbar({
   className,
@@ -33,7 +29,9 @@ export function FloatingNavbar({
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
+  const [showAccentPicker, setShowAccentPicker] = useState(false);
   const router = useRouter();
+  const { accentColor, updateAccentColor, ACCENT_COLORS } = useAccentColor();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,7 +59,7 @@ export function FloatingNavbar({
   return (
     <div
       className={cn(
-        "fixed top-6 right-6 z-50 flex items-center gap-2 p-1 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg transition-all duration-300",
+        "fixed z-50 flex items-center gap-2 p-1 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg transition-all duration-300",
         scrolled ? "top-4 right-4" : "top-6 right-6",
         className,
       )}
@@ -84,7 +82,49 @@ export function FloatingNavbar({
 
       <div className="w-px h-4 bg-border mx-1" />
 
-      <div className="flex items-center gap-1 px-1">
+      <div className="flex items-center gap-1 px-1 relative">
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <button
+                onClick={() => setShowAccentPicker(!showAccentPicker)}
+                className={cn(
+                    "p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors",
+                    showAccentPicker && "bg-muted text-primary"
+                )}
+                >
+                <Palette className="h-4 w-4" />
+                </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Accent Color</TooltipContent>
+        </Tooltip>
+
+        <AnimatePresence>
+            {showAccentPicker && (
+                <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    className="absolute top-full right-0 mt-2 p-2 rounded-2xl bg-background/95 backdrop-blur border border-border shadow-xl grid grid-cols-4 gap-2 min-w-[140px]"
+                >
+                    {ACCENT_COLORS.map((color) => (
+                        <button
+                            key={color.name}
+                            onClick={() => {
+                                updateAccentColor(color);
+                                setShowAccentPicker(false);
+                            }}
+                            className={cn(
+                                "h-6 w-6 rounded-full border-2 transition-transform hover:scale-110",
+                                color.className,
+                                accentColor.name === color.name ? "border-foreground" : "border-transparent"
+                            )}
+                            title={color.name}
+                        />
+                    ))}
+                </motion.div>
+            )}
+        </AnimatePresence>
+
         <Tooltip>
           <TooltipTrigger asChild>
             <button

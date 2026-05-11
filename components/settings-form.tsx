@@ -21,6 +21,7 @@ const settingsSchema = z.object({
   defaultTaxRate: z.number().min(0),
   invoicePrefix: z.string().min(1),
   invoicePadding: z.number().min(1),
+  currency: z.string().min(3).max(3),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -44,6 +45,7 @@ export function SettingsForm({ userId, initialData }: SettingsFormProps) {
       defaultTaxRate: 0,
       invoicePrefix: "INV-",
       invoicePadding: 4,
+      currency: "LKR",
     },
   });
 
@@ -201,6 +203,23 @@ export function SettingsForm({ userId, initialData }: SettingsFormProps) {
               placeholder="Payment is due within 30 days."
               className="w-full h-12 px-4 rounded-xl bg-background/50 border border-border/40 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all google-sans"
             />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground local-jetbrains-mono ml-1">
+              Primary Currency (ISO)
+            </label>
+            <select
+              {...form.register("currency")}
+              className="w-full h-12 px-4 rounded-xl bg-background/50 border border-border/40 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all google-sans"
+            >
+                <option value="LKR">LKR (Sri Lankan Rupee)</option>
+                <option value="USD">USD (US Dollar)</option>
+                <option value="EUR">EUR (Euro)</option>
+                <option value="GBP">GBP (British Pound)</option>
+                <option value="AUD">AUD (Australian Dollar)</option>
+                <option value="CAD">CAD (Canadian Dollar)</option>
+                <option value="JPY">JPY (Japanese Yen)</option>
+            </select>
           </div>
         </div>
       </div>

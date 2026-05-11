@@ -26,7 +26,7 @@
   --border: hsl(222 13% 85%);
   --input: hsl(222 13% 85%);
   --ring: var(--primary);
-  --radius: 0.625rem;
+  --radius: 0.5rem;
   --sidebar: hsl(218 48% 95%);
   --sidebar-foreground: hsl(220 27% 4%);
   --sidebar-primary: var(--primary);
@@ -60,6 +60,7 @@
   --border: hsl(218 10% 16%);
   --input: hsl(218 10% 16%);
   --ring: var(--primary);
+  --radius: 0.5rem;
   --sidebar: hsl(223 24% 6%);
   --sidebar-foreground: hsl(216 33% 94%);
   --sidebar-primary: var(--primary);

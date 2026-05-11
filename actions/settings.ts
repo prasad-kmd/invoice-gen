@@ -17,6 +17,7 @@ const settingsSchema = z.object({
 	defaultTaxRate: z.number().min(0),
 	invoicePrefix: z.string().min(1),
 	invoicePadding: z.number().min(1),
+	currency: z.string().min(3).max(3),
 });
 
 export async function getSettings(userId: string) {

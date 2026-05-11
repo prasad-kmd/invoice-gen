@@ -8,22 +8,20 @@ import {
   ReceiptText,
   Settings,
   LogOut,
-  Menu,
-  X,
   ChevronLeft,
   ChevronRight,
+  Terminal,
 } from "lucide-react";
-import { useState } from "react";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { useSidebar } from "./sidebar-context";
-import { FloatingNavbar } from "./floating-navbar";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { motion } from "framer-motion";
+import { siteConfig } from "@/lib/config";
 
 const navigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -35,7 +33,6 @@ const navigationItems = [
 export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isCollapsed, toggleSidebar } = useSidebar();
 
   const handleLogout = async () => {
@@ -60,7 +57,6 @@ export function Navigation() {
         <TooltipTrigger asChild>
           <Link
             href={item.href}
-            onClick={() => setMobileMenuOpen(false)}
             className={cn(
               "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all gap-3 relative group local-jetbrains-mono",
               isActive
@@ -71,10 +67,10 @@ export function Navigation() {
                 : "justify-start",
             )}
           >
-            <item.icon className="h-5 w-5 shrink-0" />
+            <item.icon className={cn("h-5 w-5 shrink-0 transition-transform group-hover:scale-110", isActive && "text-primary")} />
             <span
               className={cn(
-                "transition-opacity duration-300",
+                "transition-all duration-300",
                 isCollapsed
                   ? "lg:opacity-0 lg:w-0 lg:overflow-hidden"
                   : "opacity-100",
@@ -82,10 +78,16 @@ export function Navigation() {
             >
               {item.name}
             </span>
+            {isActive && !isCollapsed && (
+                <motion.div
+                    layoutId="active-nav-indicator"
+                    className="absolute left-0 w-1 h-6 bg-primary rounded-r-full"
+                />
+            )}
           </Link>
         </TooltipTrigger>
         {isCollapsed && (
-          <TooltipContent side="right" className="ml-2">
+          <TooltipContent side="right" className="ml-2 font-bold local-jetbrains-mono uppercase text-[10px] tracking-widest">
             {item.name}
           </TooltipContent>
         )}
@@ -95,102 +97,92 @@ export function Navigation() {
 
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-border bg-background/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:hidden">
-        <Link href="/" className="text-lg font-bold">
-          PC Repair
+      {/* Top Banner Mobile */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex h-14 items-center justify-between border-b border-border/40 bg-background/60 px-4 backdrop-blur-xl lg:hidden">
+        <Link href="/" className="flex items-center gap-2">
+            <div className="h-7 w-7 bg-primary rounded flex items-center justify-center">
+                <Terminal className="h-4 w-4 text-primary-foreground" />
+            </div>
+            <span className="text-lg font-bold mozilla-headline tracking-tight">
+                {siteConfig.author}
+            </span>
         </Link>
-        <div className="flex items-center gap-2">
-          <FloatingNavbar
-            isMobileSidebar={true}
-            className="!relative !top-0 !right-0 !shadow-none !bg-transparent !p-0"
-          />
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="rounded-lg p-2 hover:bg-muted ml-1"
-          >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
+        <div className="h-8 w-8 rounded-full bg-muted/50 border border-border/50 overflow-hidden">
+            {/* User Avatar Placeholder */}
+            <div className="h-full w-full flex items-center justify-center text-[10px] font-bold">
+                AD
+            </div>
         </div>
       </div>
 
-      {/* Sidebar */}
+      {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 border-r border-border bg-card/70 backdrop-blur-xl transition-all duration-300 ease-in-out lg:translate-x-0",
-          mobileMenuOpen ? "translate-x-0" : "-translate-x-full",
-          isCollapsed ? "lg:w-20 w-64" : "w-64",
+          "fixed inset-y-0 left-0 z-40 hidden border-r border-border bg-card/70 backdrop-blur-xl transition-all duration-300 ease-in-out lg:block",
+          isCollapsed ? "w-20" : "w-64",
         )}
       >
         <div className="flex h-full flex-col relative">
-          {/* Collapse Toggle Button (Desktop only) */}
+          {/* Collapse Toggle Button */}
           <button
             onClick={toggleSidebar}
-            className="absolute -right-3 top-20 z-50 hidden lg:flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card text-muted-foreground hover:text-foreground shadow-sm transition-transform hover:scale-110 group google-sans"
-            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="absolute -right-3 top-20 z-50 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card text-muted-foreground hover:text-foreground shadow-sm transition-transform hover:scale-110 group"
           >
             {isCollapsed ? (
               <ChevronRight className="h-4 w-4" />
             ) : (
               <ChevronLeft className="h-4 w-4" />
             )}
-            <span className="absolute left-full ml-4 px-2 py-1 bg-popover text-popover-foreground text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-border shadow-sm z-50">
-              {isCollapsed ? "Expand" : "Collapse"}
-            </span>
           </button>
+
           {/* Logo */}
           <div
             className={cn(
-              "border-b border-border px-6 py-6 transition-all duration-300",
-              isCollapsed ? "px-4 overflow-hidden" : "px-6",
+              "px-6 py-8 transition-all duration-300",
+              isCollapsed ? "px-4" : "px-6",
             )}
           >
             <Link
               href="/"
               className="block"
-              onClick={() => setMobileMenuOpen(false)}
             >
               <div
                 className={cn(
                   "flex items-center gap-3",
-                  isCollapsed && "lg:gap-0 lg:justify-center",
+                  isCollapsed && "justify-center gap-0",
                 )}
               >
-                <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center shrink-0">
-                  <ReceiptText className="h-5 w-5 text-primary-foreground" />
+                <div className="h-10 w-10 bg-primary rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+                  <Terminal className="h-6 w-6 text-primary-foreground" />
                 </div>
                 {!isCollapsed && (
-                  <div className="animate-in fade-in slide-in-from-left-2 duration-300 hidden lg:block">
-                    <h1 className="text-xl font-bold text-balance leading-tight mozilla-headline">
-                      PC Repair
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="overflow-hidden whitespace-nowrap"
+                  >
+                    <h1 className="text-xl font-bold leading-tight mozilla-headline tracking-tight">
+                      {siteConfig.author}
                     </h1>
-                    <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-primary/80 font-bold google-sans">
-                      Invoice Gen
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-primary/80 font-bold local-jetbrains-mono">
+                      {siteConfig.name}
                     </p>
-                  </div>
+                  </motion.div>
                 )}
-                <div className="lg:hidden">
-                  <h1 className="text-xl font-bold text-balance leading-tight mozilla-headline">
-                    PC Repair
-                  </h1>
-                </div>
               </div>
             </Link>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+          <nav className="flex-1 space-y-1 px-3 py-4">
             {navigationItems.map(renderNavItem)}
           </nav>
 
-          {/* Footer / Logout */}
+          {/* Logout */}
           <div
             className={cn(
               "border-t border-border px-3 py-4",
-              isCollapsed && "lg:px-2",
+              isCollapsed && "px-2",
             )}
           >
             <Tooltip delayDuration={0}>
@@ -199,24 +191,15 @@ export function Navigation() {
                   onClick={handleLogout}
                   className={cn(
                     "flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium transition-all gap-3 text-destructive hover:bg-destructive/10 local-jetbrains-mono",
-                    isCollapsed && "lg:justify-center lg:px-2",
+                    isCollapsed && "justify-center px-2",
                   )}
                 >
                   <LogOut className="h-5 w-5 shrink-0" />
-                  <span
-                    className={cn(
-                      "transition-opacity duration-300",
-                      isCollapsed
-                        ? "lg:opacity-0 lg:w-0 lg:overflow-hidden"
-                        : "opacity-100",
-                    )}
-                  >
-                    Logout
-                  </span>
+                  {!isCollapsed && <span>Logout</span>}
                 </button>
               </TooltipTrigger>
               {isCollapsed && (
-                <TooltipContent side="right" className="ml-2">
+                <TooltipContent side="right" className="ml-2 font-bold local-jetbrains-mono uppercase text-[10px] tracking-widest bg-destructive text-destructive-foreground">
                   Logout
                 </TooltipContent>
               )}
@@ -225,15 +208,7 @@ export function Navigation() {
         </div>
       </aside>
 
-      {/* Mobile menu overlay */}
-      {mobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-background/80 backdrop-blur-sm lg:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
-
-      {/* Spacer for mobile */}
+      {/* Mobile Top Spacer */}
       <div className="h-14 lg:hidden" />
     </>
   );

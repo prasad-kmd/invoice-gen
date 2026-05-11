@@ -14,7 +14,17 @@ import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
+import { getSettings } from "@/actions/settings";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+
 export default async function DashboardPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const settings = await getSettings(session?.user.id!);
+  const currency = settings?.currency || "LKR";
+
   const stats = await getDashboardStats();
   const recentInvoices = await getRecentInvoices();
 
@@ -28,21 +38,21 @@ export default async function DashboardPage() {
     },
     {
       title: "Amount Paid",
-      value: formatCurrency(stats.amountPaid),
+      value: formatCurrency(stats.amountPaid, currency),
       icon: CheckCircle2,
       color: "text-emerald-500",
       bg: "bg-emerald-500/10",
     },
     {
       title: "Outstanding",
-      value: formatCurrency(stats.outstanding),
+      value: formatCurrency(stats.outstanding, currency),
       icon: Clock,
       color: "text-amber-500",
       bg: "bg-amber-500/10",
     },
     {
       title: "Overdue",
-      value: formatCurrency(stats.overdue),
+      value: formatCurrency(stats.overdue, currency),
       icon: AlertCircle,
       color: "text-rose-500",
       bg: "bg-rose-500/10",
@@ -50,21 +60,21 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-10 py-8 animate-in fade-in duration-700">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-4xl md:text-5xl font-black mozilla-headline tracking-tight">
+    <div className="space-y-6 py-4 animate-in fade-in duration-700">
+      <div className="flex flex-col gap-1">
+        <h1 className="text-3xl md:text-4xl font-black mozilla-headline tracking-tight">
           Dashboard
         </h1>
-        <p className="text-muted-foreground google-sans">
+        <p className="text-sm text-muted-foreground google-sans">
           Overview of your repair business performance.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat, i) => (
           <div
             key={stat.title}
-            className="group relative p-6 rounded-[2rem] border border-border/40 bg-card/80 backdrop-blur-3xl shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/40"
+            className="group relative p-4 rounded-xl border border-border/40 bg-card/80 backdrop-blur-3xl shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-primary/40"
           >
             <div className="flex items-center justify-between mb-4">
               <div className={cn("p-3 rounded-2xl", stat.bg)}>
@@ -85,10 +95,10 @@ export default async function DashboardPage() {
       </div>
 
       <div className="relative group">
-        <div className="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
-        <div className="relative rounded-[3rem] border border-border/40 bg-card/80 backdrop-blur-3xl shadow-2xl overflow-hidden min-h-[400px]">
-          <div className="p-8 border-b border-border/40 flex items-center justify-between">
-            <h2 className="text-2xl font-bold mozilla-headline tracking-tight flex items-center gap-3">
+        <div className="absolute -inset-2 bg-gradient-to-tr from-primary/10 to-secondary/10 rounded-2xl blur-xl opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
+        <div className="relative rounded-2xl border border-border/40 bg-card/80 backdrop-blur-3xl shadow-xl overflow-hidden min-h-[400px]">
+          <div className="p-6 border-b border-border/40 flex items-center justify-between">
+            <h2 className="text-xl font-bold mozilla-headline tracking-tight flex items-center gap-2">
               <ReceiptText className="h-6 w-6 text-primary" />
               Recent Invoices
             </h2>
@@ -157,7 +167,7 @@ export default async function DashboardPage() {
                         </span>
                       </td>
                       <td className="px-8 py-4 text-right font-bold local-jetbrains-mono text-sm">
-                        {formatCurrency(invoice.totalAmount)}
+                        {formatCurrency(invoice.totalAmount, currency)}
                       </td>
                     </tr>
                   ))
