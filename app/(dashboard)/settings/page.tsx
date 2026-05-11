@@ -4,6 +4,7 @@ import { user } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { SettingsForm } from "@/components/settings-form";
 import { redirect } from "next/navigation";
+import { MicroBadge } from "@/components/ui/design-system";
 
 export const dynamic = "force-dynamic";
 
@@ -17,10 +18,11 @@ export default async function SettingsPage() {
 	const settings = await getSettings(adminUser.id);
 
 	return (
-		<div className="mx-auto max-w-4xl space-y-8">
+		<div className="max-w-4xl space-y-10">
 			<div>
-				<h1 className="text-3xl font-bold">Settings</h1>
-				<p className="text-muted-foreground">Configure your business profile and invoice defaults.</p>
+                <MicroBadge className="mb-2">Configuration</MicroBadge>
+				<h1 className="text-4xl font-black mozilla-headline tracking-tighter">Settings</h1>
+				<p className="text-muted-foreground local-inter mt-1">Configure your business profile and invoice defaults.</p>
 			</div>
 
 			<SettingsForm userId={adminUser.id} initialData={settings} />

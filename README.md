@@ -1,83 +1,59 @@
 # PC Repair Invoice Generator
 
-A private, general-purpose invoice generator web app designed specifically for PC repair technicians. Completely dynamic with zero hardcoded services or prices.
+A modern, production-grade invoice management platform for tech professionals. Built with a premium aesthetic inspired by NEXT-Notion-CMS.
 
-## Features
+## ✨ New Redesign Highlights
 
-- **Dashboard:** At-a-glance summary of total invoices, paid amounts, outstanding balances, and overdue accounts.
-- **Client Management:** Store and manage client contact details for reuse. View full invoice history per client.
-- **Dynamic Invoices:** Create invoices with customizable line items, quantities, and prices. Automatic calculation of subtotals, tax, discounts, and grand totals.
-- **Professional PDF Generation:** Download print-optimized, professional-grade PDF invoices using `@react-pdf/renderer`.
-- **Business Settings:** Configure your business profile (name, logo, address) and set global defaults for tax rates and payment terms.
-- **Role-Based Security:** Integrated with Better Auth and Supabase. Admin-only access restricted to users with the `admin` role.
+- **Aesthetic UI:** Redesigned from the ground up with glassy surfaces, teal/cyan accents, and a dark-first experience.
+- **Premium Homepage:** A high-fidelity marketing landing page with interactive hero sections and feature showcases.
+- **Improved Layout:** A sophisticated app shell featuring a collapsible desktop sidebar, floating utility navbar, and a mobile bottom dock navigation.
+- **Multi-Currency:** Support for Sri Lankan Rupee (LKR) as default, plus major international currencies (USD, EUR, GBP, etc.).
+- **Workflow Efficiency:** Create clients inline directly from the invoice form without losing your progress.
+- **High-Fidelity PDFs:** Upgraded PDF engine with brand-consistent typography, subtle borders, and professional layout.
 
-## Tech Stack
+## 🚀 Features
+
+- **Redesigned Dashboard:** At-a-glance summary with bento-style stat cards and latest activity tracking.
+- **Client Management:** Fully responsive CRM interface for managing client relationships and invoice history.
+- **Dynamic Invoices:** Interactive invoice builder with real-time preview and automated calculations.
+- **Professional PDF Generation:** Download print-optimized, professional-grade PDF invoices.
+- **Business Settings:** Centralized configuration for business profile, tax rates, and default currency.
+- **Next.js 16 Ready:** Leveraging the latest App Router features, including custom error boundaries and loading states.
+
+## 🛠️ Tech Stack
 
 - **Framework:** Next.js 16 (App Router)
 - **Styling:** Tailwind CSS 4
+- **UI Components:** Radix UI & shadcn/ui
 - **Database:** Supabase (PostgreSQL)
 - **ORM:** Drizzle ORM
 - **Auth:** Better Auth
-- **PDF:** `@react-pdf/renderer`
-- **Validation:** Zod
+- **PDF:** @react-pdf/renderer
 
-## Prerequisites
+## ⚙️ Prerequisites
 
 - Node.js 20+
-- pnpm (recommended)
+- pnpm 9+
 - Supabase account and a PostgreSQL database
 
-## Setup Instructions
+## 📝 Setup Instructions
 
-1.  **Clone the Repository:**
-    ```bash
-    git clone <repository-url>
-    cd pc-repair-invoice-generator
-    ```
-
-2.  **Install Dependencies:**
-    ```bash
-    pnpm install
-    ```
-
+1.  **Clone the Repository**
+2.  **Install Dependencies**
 3.  **Configure Environment Variables:**
-    Copy `.env.example` to `.env.local` and fill in the required values:
-    - `DATABASE_URL`: Your Supabase connection string.
-    - `BETTER_AUTH_SECRET`: A secure 32-character string.
-    - `BETTER_AUTH_URL`: Your app's base URL (e.g., `http://localhost:3000`).
-    - `NEXT_PUBLIC_APP_URL`: Same as above.
+    Copy `.env.example` to `.env.local` and fill in:
+    - `DATABASE_URL`
+    - `BETTER_AUTH_SECRET`
+    - `BETTER_AUTH_URL`
+    - `NEXT_PUBLIC_APP_URL`
+4.  **Database Migration:** `pnpm db:push`
+5.  **Admin User Setup:** Set `role` to `admin` for your user in the Supabase `user` table.
+6.  **Run Locally:** `pnpm dev`
 
-4.  **Database Migration:**
-    Push the schema to your existing Supabase database:
-    ```bash
-    pnpm db:push
-    ```
-    *Note: This will only add the new tables (`clients`, `invoices`, etc.) and will not modify existing user/auth tables.*
+## 🎨 Design System
 
-5.  **Admin User Setup:**
-    Ensure at least one user in your `user` table has the `role` column set to `admin`.
+The design is governed by `DESIGN.md`, utilizing a single teal accent system (`hsl(181 100% 28%)`) and local fonts (Mozilla Headline, Inter, JetBrains Mono) for a high-performance, offline-friendly experience.
 
-6.  **Run Locally:**
-    ```bash
-    pnpm dev
-    ```
-
-7.  **Initial Configuration:**
-    Log in, navigate to the **Settings** page, and configure your business profile to enable invoice generation.
-
-## Deployment
-
-Deploy to Vercel as a new project, ensuring all environment variables from `.env.local` are configured in the Vercel dashboard.
-
-## Project Structure
-
-- `app/`: Next.js routes and pages.
-- `actions/`: Server actions for database mutations.
-- `components/`: UI components, invoice forms, and PDF templates.
-- `db/`: Drizzle schema and migration files.
-- `lib/`: Utility functions and auth/database configuration.
-- `types/` & `validators/`: TypeScript definitions and Zod schemas.
-
-## License
+## 📄 License
 
 This project is licensed under the AGPL-3.0 License.

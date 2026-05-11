@@ -5,15 +5,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createInvoice, updateInvoice } from "@/actions/invoices";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Trash2, Save } from "lucide-react";
+import { Plus, Trash2, Save, FileText, Users, Calculator, MessageSquare, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { InvoicePreview } from "./invoice-preview";
 import { formatCurrency } from "@/lib/utils";
 import { useState } from "react";
 import * as z from "zod";
+import { GlassCard, MicroBadge } from "@/components/ui/design-system";
+import { QuickAddClient } from "./quick-add-client";
 
 const invoiceItemSchema = z.object({
 	id: z.string().optional(),
@@ -31,6 +33,7 @@ const invoiceSchema = z.object({
 	discountAmount: z.number().min(0),
 	customNotes: z.string().optional(),
 	paymentTerms: z.string().optional(),
+	currency: z.string().min(1),
 	items: z.array(invoiceItemSchema).min(1, "At least one item is required"),
 });
 
@@ -41,9 +44,19 @@ interface InvoiceFormProps {
 	initialData?: any;
 }
 
-export function InvoiceForm({ userId, clients, business, initialData }: InvoiceFormProps) {
+const currencies = [
+	{ code: "LKR", name: "Sri Lankan Rupee" },
+	{ code: "USD", name: "US Dollar" },
+	{ code: "EUR", name: "Euro" },
+	{ code: "GBP", name: "British Pound" },
+	{ code: "INR", name: "Indian Rupee" },
+	{ code: "AUD", name: "Australian Dollar" },
+];
+
+export function InvoiceForm({ userId, clients: initialClients, business, initialData }: InvoiceFormProps) {
 	const router = useRouter();
 	const [showPreview, setShowPreview] = useState(false);
+	const [clients, setClients] = useState(initialClients);
 
 	const form = useForm({
 		resolver: zodResolver(invoiceSchema),
@@ -60,6 +73,7 @@ export function InvoiceForm({ userId, clients, business, initialData }: InvoiceF
 			discountAmount: 0,
 			customNotes: "",
 			paymentTerms: business?.defaultPaymentTerms || "",
+			currency: business?.defaultCurrency || "LKR",
 			items: [{ description: "", quantity: 1, unitPrice: 0 }],
 		},
 	});
@@ -72,6 +86,7 @@ export function InvoiceForm({ userId, clients, business, initialData }: InvoiceF
 	const watchedItems = form.watch("items");
 	const watchedTaxRate = form.watch("taxRate");
 	const watchedDiscount = form.watch("discountAmount");
+	const watchedCurrency = form.watch("currency");
 
 	const subtotal = watchedItems.reduce((acc: number, item: any) => acc + (item.quantity * item.unitPrice || 0), 0);
 	const taxAmount = (subtotal * (watchedTaxRate || 0)) / 100;
@@ -94,18 +109,32 @@ export function InvoiceForm({ userId, clients, business, initialData }: InvoiceF
 	}
 
 	return (
-		<div className="grid gap-8 lg:grid-cols-2">
-			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-				<Card>
-					<CardHeader>
-						<CardTitle>Invoice Details</CardTitle>
-					</CardHeader>
-					<CardContent className="grid gap-4 md:grid-cols-2">
+		<div className="grid gap-10 lg:grid-cols-2 pb-20">
+			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+				<GlassCard className="p-0 border-border/40 overflow-hidden">
+                    <div className="p-6 border-b border-border/40 bg-card/50 flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                            <Users size={20} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold mozilla-headline">Client & Schedule</h2>
+                            <p className="text-xs text-muted-foreground google-sans uppercase tracking-widest mt-0.5">Who and when</p>
+                        </div>
+                    </div>
+					<CardContent className="p-8 grid gap-6 md:grid-cols-2">
 						<div className="space-y-2">
-							<label className="text-sm font-medium">Client</label>
+							<div className="flex items-center justify-between px-1">
+								<label className="text-xs font-bold local-jetbrains-mono uppercase tracking-widest text-muted-foreground">Client</label>
+								<QuickAddClient
+									onClientAdded={(newClient) => {
+										setClients(prev => [newClient, ...prev]);
+										form.setValue("clientId", newClient.id);
+									}}
+								/>
+							</div>
 							<select
 								{...form.register("clientId")}
-								className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+								className="flex h-12 w-full rounded-xl border border-border/40 bg-background/50 px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all local-inter"
 							>
 								<option value="">Select a client</option>
 								{clients.map((c) => (
@@ -116,10 +145,10 @@ export function InvoiceForm({ userId, clients, business, initialData }: InvoiceF
 							</select>
 						</div>
 						<div className="space-y-2">
-							<label className="text-sm font-medium">Status</label>
+							<label className="text-xs font-bold local-jetbrains-mono uppercase tracking-widest text-muted-foreground px-1">Status</label>
 							<select
 								{...form.register("status")}
-								className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+								className="flex h-12 w-full rounded-xl border border-border/40 bg-background/50 px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all local-inter"
 							>
 								{["draft", "sent", "paid", "overdue", "cancelled"].map((s) => (
 									<option key={s} value={s}>
@@ -129,65 +158,90 @@ export function InvoiceForm({ userId, clients, business, initialData }: InvoiceF
 							</select>
 						</div>
 						<div className="space-y-2">
-							<label className="text-sm font-medium">Issue Date</label>
+							<label className="text-xs font-bold local-jetbrains-mono uppercase tracking-widest text-muted-foreground px-1">Issue Date</label>
 							<Input
 								type="date"
 								{...form.register("issueDate", { valueAsDate: true })}
+								className="h-12 rounded-xl bg-background/50 border-border/40"
 								defaultValue={form.getValues("issueDate")?.toISOString().split("T")[0]}
 							/>
 						</div>
 						<div className="space-y-2">
-							<label className="text-sm font-medium">Due Date</label>
+							<label className="text-xs font-bold local-jetbrains-mono uppercase tracking-widest text-muted-foreground px-1">Due Date</label>
 							<Input
 								type="date"
 								{...form.register("dueDate", { valueAsDate: true })}
+								className="h-12 rounded-xl bg-background/50 border-border/40"
 								defaultValue={form.getValues("dueDate")?.toISOString().split("T")[0]}
 							/>
 						</div>
+                        <div className="space-y-2">
+							<label className="text-xs font-bold local-jetbrains-mono uppercase tracking-widest text-muted-foreground px-1">Currency</label>
+							<select
+                                {...form.register("currency")}
+                                className="flex h-12 w-full rounded-xl border border-border/40 bg-background/50 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all local-inter"
+                            >
+								{currencies.map((c) => (
+									<option key={c.code} value={c.code}>
+										{c.code} - {c.name}
+									</option>
+								))}
+							</select>
+						</div>
 					</CardContent>
-				</Card>
+				</GlassCard>
 
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0">
-						<CardTitle>Line Items</CardTitle>
-						<Button type="button" size="sm" onClick={() => append({ description: "", quantity: 1, unitPrice: 0 })}>
-							<Plus className="mr-2 h-4 w-4" />
-							Add Item
+				<GlassCard className="p-0 border-border/40 overflow-hidden">
+                    <div className="p-6 border-b border-border/40 bg-card/50 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                                <FileText size={20} />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold mozilla-headline">Line Items</h2>
+                                <p className="text-xs text-muted-foreground google-sans uppercase tracking-widest mt-0.5">Services & Parts</p>
+                            </div>
+                        </div>
+						<Button type="button" size="sm" onClick={() => append({ description: "", quantity: 1, unitPrice: 0 })} className="rounded-full bg-primary/10 text-primary hover:bg-primary/20 border-none px-4">
+							<Plus className="mr-1.5 h-4 w-4" />
+							Add
 						</Button>
-					</CardHeader>
-					<CardContent>
+                    </div>
+					<CardContent className="p-0">
 						<Table>
 							<TableHeader>
-								<TableRow>
-									<TableHead>Description</TableHead>
-									<TableHead className="w-24">Qty</TableHead>
-									<TableHead className="w-32">Price</TableHead>
-									<TableHead className="w-20"></TableHead>
+								<TableRow className="hover:bg-transparent border-border/40 bg-muted/30">
+									<TableHead className="google-sans text-[10px] uppercase tracking-widest px-6 h-12">Description</TableHead>
+									<TableHead className="google-sans text-[10px] uppercase tracking-widest px-4 h-12 w-24 text-center">Qty</TableHead>
+									<TableHead className="google-sans text-[10px] uppercase tracking-widest px-4 h-12 w-32 text-right">Price</TableHead>
+									<TableHead className="google-sans text-[10px] uppercase tracking-widest px-6 h-12 w-16"></TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
 								{fields.map((field, index) => (
-									<TableRow key={field.id}>
-										<TableCell>
-											<Input {...form.register(`items.${index}.description`)} placeholder="Service description" />
+									<TableRow key={field.id} className="border-border/40">
+										<TableCell className="px-6 py-4">
+											<Input {...form.register(`items.${index}.description`)} placeholder="Service description" className="bg-transparent border-none focus-visible:ring-0 px-0 h-8" />
 										</TableCell>
-										<TableCell>
+										<TableCell className="px-4 py-4">
 											<Input
 												type="number"
-												step="0.01"
+												step="1"
 												{...form.register(`items.${index}.quantity`, { valueAsNumber: true })}
+                                                className="bg-muted/30 border-border/20 text-center h-8 px-1"
 											/>
 										</TableCell>
-										<TableCell>
+										<TableCell className="px-4 py-4">
 											<Input
 												type="number"
 												step="0.01"
 												{...form.register(`items.${index}.unitPrice`, { valueAsNumber: true })}
+                                                className="bg-muted/30 border-border/20 text-right h-8 px-1"
 											/>
 										</TableCell>
-										<TableCell>
-											<Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
-												<Trash2 className="h-4 w-4 text-destructive" />
+										<TableCell className="px-6 py-4 text-right">
+											<Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="h-8 w-8 text-muted-foreground hover:text-destructive transition-colors">
+												<Trash2 className="h-4 w-4" />
 											</Button>
 										</TableCell>
 									</TableRow>
@@ -195,78 +249,110 @@ export function InvoiceForm({ userId, clients, business, initialData }: InvoiceF
 							</TableBody>
 						</Table>
 					</CardContent>
-				</Card>
+				</GlassCard>
 
-				<Card>
-					<CardHeader>
-						<CardTitle>Financial Summary</CardTitle>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<div className="grid grid-cols-2 gap-4">
+				<GlassCard className="p-0 border-border/40 overflow-hidden">
+                    <div className="p-6 border-b border-border/40 bg-card/50 flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                            <Calculator size={20} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold mozilla-headline">Financial Summary</h2>
+                            <p className="text-xs text-muted-foreground google-sans uppercase tracking-widest mt-0.5">Totals & Adjustments</p>
+                        </div>
+                    </div>
+					<CardContent className="p-8 space-y-6">
+						<div className="grid grid-cols-2 gap-6">
 							<div className="space-y-2">
-								<label className="text-sm font-medium">Tax Rate (%)</label>
-								<Input type="number" step="0.01" {...form.register("taxRate", { valueAsNumber: true })} />
+								<label className="text-xs font-bold local-jetbrains-mono uppercase tracking-widest text-muted-foreground px-1">Tax Rate (%)</label>
+								<Input type="number" step="0.01" {...form.register("taxRate", { valueAsNumber: true })} className="h-12 rounded-xl bg-background/50 border-border/40" />
 							</div>
 							<div className="space-y-2">
-								<label className="text-sm font-medium">Discount Amount</label>
-								<Input type="number" step="0.01" {...form.register("discountAmount", { valueAsNumber: true })} />
+								<label className="text-xs font-bold local-jetbrains-mono uppercase tracking-widest text-muted-foreground px-1">Discount Amount</label>
+								<Input type="number" step="0.01" {...form.register("discountAmount", { valueAsNumber: true })} className="h-12 rounded-xl bg-background/50 border-border/40" />
 							</div>
 						</div>
-						<div className="space-y-2 border-t pt-4">
-							<div className="flex justify-between text-sm">
-								<span>Subtotal</span>
-								<span>{formatCurrency(subtotal)}</span>
+						<div className="space-y-3 pt-6 border-t border-border/40">
+							<div className="flex justify-between items-center px-2">
+								<span className="text-sm text-muted-foreground google-sans uppercase tracking-widest">Subtotal</span>
+								<span className="font-bold local-jetbrains-mono">{formatCurrency(subtotal, watchedCurrency)}</span>
 							</div>
-							<div className="flex justify-between text-sm">
-								<span>Tax</span>
-								<span>{formatCurrency(taxAmount)}</span>
+							<div className="flex justify-between items-center px-2">
+								<span className="text-sm text-muted-foreground google-sans uppercase tracking-widest">Tax ({watchedTaxRate}%)</span>
+								<span className="font-bold local-jetbrains-mono">{formatCurrency(taxAmount, watchedCurrency)}</span>
 							</div>
-							<div className="flex justify-between text-lg font-bold">
-								<span>Total</span>
-								<span className="text-primary">{formatCurrency(total)}</span>
+							<div className="flex justify-between items-center bg-primary/5 p-4 rounded-2xl border border-primary/10">
+								<span className="text-lg font-black mozilla-headline tracking-tight">Total</span>
+								<span className="text-2xl font-black mozilla-headline text-primary tracking-tight">{formatCurrency(total, watchedCurrency)}</span>
 							</div>
 						</div>
 					</CardContent>
-				</Card>
+				</GlassCard>
 
-				<Card>
-					<CardHeader>
-						<CardTitle>Notes & Terms</CardTitle>
-					</CardHeader>
-					<CardContent className="space-y-4">
+				<GlassCard className="p-0 border-border/40 overflow-hidden">
+                    <div className="p-6 border-b border-border/40 bg-card/50 flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                            <MessageSquare size={20} />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold mozilla-headline">Notes & Terms</h2>
+                            <p className="text-xs text-muted-foreground google-sans uppercase tracking-widest mt-0.5">Additional Details</p>
+                        </div>
+                    </div>
+					<CardContent className="p-8 space-y-6">
 						<div className="space-y-2">
-							<label className="text-sm font-medium">Custom Notes</label>
+							<label className="text-xs font-bold local-jetbrains-mono uppercase tracking-widest text-muted-foreground px-1">Custom Notes</label>
 							<textarea
 								{...form.register("customNotes")}
-								className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-								placeholder="Warranty info, etc."
+								className="flex min-h-[100px] w-full rounded-xl border border-border/40 bg-background/50 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all local-inter"
+								placeholder="Warranty info, repair details, etc."
 							/>
 						</div>
 						<div className="space-y-2">
-							<label className="text-sm font-medium">Payment Terms</label>
+							<label className="text-xs font-bold local-jetbrains-mono uppercase tracking-widest text-muted-foreground px-1">Payment Terms</label>
 							<textarea
 								{...form.register("paymentTerms")}
-								className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-								placeholder="Bank details, etc."
+								className="flex min-h-[100px] w-full rounded-xl border border-border/40 bg-background/50 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all local-inter"
+								placeholder="Bank details, due dates, etc."
 							/>
 						</div>
 					</CardContent>
-				</Card>
+				</GlassCard>
 
-				<div className="flex justify-end gap-4">
-					<Button type="button" variant="outline" onClick={() => setShowPreview(!showPreview)}>
-						{showPreview ? "Hide Preview" : "Show Preview"}
+				<div className="flex items-center gap-4 sticky bottom-10 lg:bottom-12 z-20">
+					<Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowPreview(!showPreview)}
+                        className="flex-1 h-14 rounded-full border-border/40 bg-card/80 backdrop-blur-xl font-bold transition-all hover:bg-muted"
+                    >
+						{showPreview ? (
+                            <>
+                                <EyeOff className="mr-2 h-5 w-5" /> Hide Preview
+                            </>
+                        ) : (
+                            <>
+                                <Eye className="mr-2 h-5 w-5" /> Show Preview
+                            </>
+                        )}
 					</Button>
-					<Button type="submit">
-						<Save className="mr-2 h-4 w-4" />
+					<Button type="submit" className="flex-1 h-14 rounded-full bg-primary hover:bg-primary-focus text-primary-foreground font-black transition-all hover:scale-105 shadow-lg shadow-primary/20">
+						<Save className="mr-2 h-5 w-5" />
 						Save Invoice
 					</Button>
 				</div>
 			</form>
 
-			<div className={showPreview ? "block" : "hidden lg:block"}>
-				<div className="sticky top-8">
-					<h3 className="mb-4 text-xl font-bold">Real-time Preview</h3>
+			<div className={showPreview ? "block fixed inset-0 z-50 bg-background p-4 overflow-y-auto lg:relative lg:inset-auto lg:z-auto lg:bg-transparent lg:p-0" : "hidden lg:block"}>
+				<div className="sticky top-24">
+					<div className="flex items-center justify-between mb-6 lg:hidden">
+                        <h3 className="text-xl font-bold mozilla-headline">Live Preview</h3>
+                        <Button variant="ghost" onClick={() => setShowPreview(false)}>Close</Button>
+                    </div>
+                    <div className="hidden lg:flex items-center gap-2 mb-6">
+                        <MicroBadge>Instant Rendering</MicroBadge>
+					    <h3 className="text-xl font-bold mozilla-headline">Real-time Preview</h3>
+                    </div>
 					<InvoicePreview
 						business={business}
 						client={clients.find((c) => c.id === form.watch("clientId"))}
