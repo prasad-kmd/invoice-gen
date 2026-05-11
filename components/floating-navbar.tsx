@@ -2,9 +2,14 @@
 
 import { usePathname } from "next/navigation";
 import {
-  Plus,
   LogOut,
-  Palette
+  Palette,
+  FilePlus,
+  UserPlus,
+  Sun,
+  Moon,
+  ChevronDown,
+  User
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -18,18 +23,25 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useAccentColor } from "@/hooks/use-accent-color";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function FloatingNavbar({
   className,
-  isMobileSidebar = false,
+  session,
 }: {
   className?: string;
-  isMobileSidebar?: boolean;
+  session?: any;
 }) {
-  const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
-  const [showAccentPicker, setShowAccentPicker] = useState(false);
   const router = useRouter();
   const { accentColor, updateAccentColor, ACCENT_COLORS } = useAccentColor();
 
@@ -51,139 +63,133 @@ export function FloatingNavbar({
     });
   };
 
-  const navItems = [
-    { name: "New Invoice", href: "/invoices/new", icon: Plus },
-    { name: "New Client", href: "/clients/new", icon: Plus },
-  ];
+  const user = session?.user;
 
   return (
     <div
       className={cn(
-        "fixed z-50 flex items-center gap-2 p-1 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg transition-all duration-300",
+        "fixed z-50 flex items-center gap-2 p-1.5 rounded-full bg-background/80 backdrop-blur-xl border border-border/40 shadow-2xl transition-all duration-300",
         scrolled ? "top-4 right-4" : "top-6 right-6",
         className,
       )}
     >
-      <div className="flex items-center gap-1 px-1">
-        {navItems.map((item) => (
-          <Tooltip key={item.name}>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => router.push(item.href)}
-                className="p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <item.icon className="h-4 w-4" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">{item.name}</TooltipContent>
-          </Tooltip>
-        ))}
-      </div>
-
-      <div className="w-px h-4 bg-border mx-1" />
-
-      <div className="flex items-center gap-1 px-1 relative">
+      <div className="flex items-center gap-1.5 px-1">
         <Tooltip>
-            <TooltipTrigger asChild>
-                <button
-                onClick={() => setShowAccentPicker(!showAccentPicker)}
-                className={cn(
-                    "p-2 rounded-full hover:bg-muted text-muted-foreground transition-colors",
-                    showAccentPicker && "bg-muted text-primary"
-                )}
-                >
-                <Palette className="h-4 w-4" />
-                </button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Accent Color</TooltipContent>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => router.push("/invoices/new")}
+              className="p-2.5 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all active:scale-90"
+            >
+              <FilePlus className="h-4.5 w-4.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-[10px] font-bold uppercase tracking-widest">New Invoice</TooltipContent>
         </Tooltip>
 
-        <AnimatePresence>
-            {showAccentPicker && (
-                <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute top-full right-0 mt-2 p-2 rounded-2xl bg-background/95 backdrop-blur border border-border shadow-xl grid grid-cols-4 gap-2 min-w-[140px]"
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => router.push("/clients/new")}
+              className="p-2.5 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all active:scale-90"
+            >
+              <UserPlus className="h-4.5 w-4.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="text-[10px] font-bold uppercase tracking-widest">New Client</TooltipContent>
+        </Tooltip>
+      </div>
+
+      <div className="w-px h-5 bg-border/40 mx-0.5" />
+
+      <div className="flex items-center gap-1.5 px-1">
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <button
+                    className="p-2.5 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
                 >
+                    <Palette className="h-4.5 w-4.5" />
+                </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="p-3 rounded-2xl bg-background/95 backdrop-blur border-border/40 shadow-2xl min-w-[180px]">
+                <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-2">Accent Color</DropdownMenuLabel>
+                <div className="grid grid-cols-4 gap-2">
                     {ACCENT_COLORS.map((color) => (
                         <button
                             key={color.name}
-                            onClick={() => {
-                                updateAccentColor(color);
-                                setShowAccentPicker(false);
-                            }}
+                            onClick={() => updateAccentColor(color)}
                             className={cn(
-                                "h-6 w-6 rounded-full border-2 transition-transform hover:scale-110",
+                                "h-7 w-7 rounded-full border-2 transition-transform hover:scale-110",
                                 color.className,
                                 accentColor.name === color.name ? "border-foreground" : "border-transparent"
                             )}
                             title={color.name}
                         />
                     ))}
-                </motion.div>
-            )}
-        </AnimatePresence>
+                </div>
+            </DropdownMenuContent>
+        </DropdownMenu>
 
         <Tooltip>
           <TooltipTrigger asChild>
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+              className="p-2.5 rounded-full hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
             >
-              <span className="sr-only">Toggle theme</span>
               {theme === "dark" ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-4 w-4"
-                >
-                  <circle cx="12" cy="12" r="4" />
-                  <path d="M12 2v2" />
-                  <path d="M12 20v2" />
-                  <path d="m4.93 4.93 1.41 1.41" />
-                  <path d="m17.66 17.66 1.41 1.41" />
-                  <path d="M2 12h2" />
-                  <path d="M22 12h2" />
-                  <path d="m4.93 19.07 1.41-1.41" />
-                  <path d="m17.66 6.34 1.41-1.41" />
-                </svg>
+                <Sun className="h-4.5 w-4.5" />
               ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-4 w-4"
-                >
-                  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-                </svg>
+                <Moon className="h-4.5 w-4.5" />
               )}
             </button>
           </TooltipTrigger>
-          <TooltipContent side="bottom">Toggle Theme</TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button 
-                onClick={handleLogout}
-                className="p-2 rounded-full hover:bg-muted text-destructive hover:text-destructive transition-colors"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">Logout</TooltipContent>
+          <TooltipContent side="bottom" className="text-[10px] font-bold uppercase tracking-widest">Theme</TooltipContent>
         </Tooltip>
       </div>
+
+      {user && (
+        <>
+            <div className="w-px h-5 bg-border/40 mx-0.5" />
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <button className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full hover:bg-muted/50 transition-all group">
+                        <Avatar className="h-8 w-8 border border-border/40 group-hover:border-primary/50 transition-colors">
+                            <AvatarImage src={user.image} />
+                            <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                                {user.name?.charAt(0) || "U"}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="hidden sm:flex flex-col items-start leading-none gap-0.5">
+                            <span className="text-xs font-bold tracking-tight">{user.name}</span>
+                            <span className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold local-jetbrains-mono">Admin</span>
+                        </div>
+                        <ChevronDown className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl bg-background/95 backdrop-blur border-border/40 shadow-2xl mt-2">
+                    <DropdownMenuLabel className="flex flex-col p-2">
+                        <span className="text-sm font-bold">{user.name}</span>
+                        <span className="text-xs text-muted-foreground font-normal truncate">{user.email}</span>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-border/40" />
+                    <DropdownMenuItem
+                        onClick={() => router.push("/settings")}
+                        className="rounded-xl p-2 cursor-pointer focus:bg-primary/10 focus:text-primary"
+                    >
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-border/40" />
+                    <DropdownMenuItem
+                        onClick={handleLogout}
+                        className="rounded-xl p-2 cursor-pointer focus:bg-destructive/10 focus:text-destructive text-destructive"
+                    >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Logout</span>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </>
+      )}
     </div>
   );
 }
