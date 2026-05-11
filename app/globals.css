@@ -75,13 +75,13 @@
     --primary: 181 100% 28%;
     --primary-focus: 181 100% 34%;
     --primary-on-dark: 181 100% 45%;
-    --primary-foreground: 181 100% 98%;
-    --secondary: 216 20% 95%;
-    --secondary-foreground: 220 27% 4%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 216 20% 90%;
+    --secondary-foreground: 220 5% 34%;
     --muted: 216 20% 90%;
     --muted-foreground: 220 5% 34%;
     --accent: 181 100% 28%;
-    --accent-foreground: 181 100% 98%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 3 65% 55%;
     --destructive-foreground: 0 0% 98%;
     --border: 222 13% 85%;
@@ -104,14 +104,14 @@
     --popover-foreground: 216 33% 94%;
     --primary: 181 100% 34%;
     --primary-focus: 181 100% 40%;
-    --primary-on-dark: 181 100% 50%;
-    --primary-foreground: 181 100% 8%;
+    --primary-on-dark: 181 100% 45%;
+    --primary-foreground: 220 27% 4%;
     --secondary: 214 13% 11%;
-    --secondary-foreground: 216 33% 94%;
+    --secondary-foreground: 220 4% 57%;
     --muted: 214 13% 11%;
     --muted-foreground: 220 4% 57%;
     --accent: 181 100% 34%;
-    --accent-foreground: 181 100% 8%;
+    --accent-foreground: 220 27% 4%;
     --destructive: 357 100% 45%;
     --destructive-foreground: 0 0% 98%;
     --border: 218 10% 16%;
@@ -143,8 +143,8 @@
     @apply bg-card/30 backdrop-blur-xl border border-border/40 shadow-2xl;
   }
 
-  .glass-dark {
-    @apply bg-card/80 backdrop-blur-3xl border border-border/40;
+  .glass-dashboard {
+    @apply bg-card/80 backdrop-blur-3xl border border-border/40 rounded-[3rem] min-h-[500px];
   }
 
   .hover-lift {

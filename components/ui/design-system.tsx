@@ -8,7 +8,7 @@ const GlassCard = React.forwardRef<
 	<div
 		ref={ref}
 		className={cn(
-			"glass rounded-2xl md:rounded-[2.5rem] overflow-hidden transition-all duration-700 hover:border-primary/40 hover:bg-card/50",
+			"bg-card/30 backdrop-blur-xl border border-border/40 rounded-2xl md:rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-700 hover:border-primary/40 hover:bg-card/50 hover:-translate-y-2",
 			className
 		)}
 		{...props}
@@ -38,7 +38,7 @@ const MicroBadge = React.forwardRef<
 	<span
 		ref={ref}
 		className={cn(
-			"text-[9px] font-bold uppercase tracking-[0.2em] font-mono bg-primary/5 border border-primary/10 rounded-full px-3 py-1 text-muted-foreground",
+			"text-[9px] font-bold uppercase tracking-[0.2em] font-mono bg-primary/5 border border-primary/10 rounded-full px-3 py-1 text-muted-foreground transition-colors hover:text-primary hover:border-primary/30",
 			className
 		)}
 		{...props}
@@ -46,4 +46,19 @@ const MicroBadge = React.forwardRef<
 ));
 MicroBadge.displayName = "MicroBadge";
 
-export { GlassCard, BentoCard, MicroBadge };
+const TechTag = React.forwardRef<
+	HTMLSpanElement,
+	React.HTMLAttributes<HTMLSpanElement>
+>(({ className, ...props }, ref) => (
+	<span
+		ref={ref}
+		className={cn(
+			"text-[8px] font-black uppercase tracking-widest border border-primary/10 px-2.5 py-1 rounded-md bg-primary/5 text-primary/60",
+			className
+		)}
+		{...props}
+	/>
+));
+TechTag.displayName = "TechTag";
+
+export { GlassCard, BentoCard, MicroBadge, TechTag };

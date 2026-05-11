@@ -241,3 +241,90 @@ https://react.dev/link/hydration-mismatch
               ...
 
  GET /login 200 in 40ms (next.js: 8ms, application-code: 32ms)
+✓ Compiled in 473ms
+✓ Compiled in 2.3s
+ GET / 200 in 4.7s (next.js: 2.9s, application-code: 1774ms)
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <Suspense name="/" fallback={<Fragment>}>
+      <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+        <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+          <RedirectBoundary>
+            <RedirectErrorBoundary router={{...}}>
+              <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+                <SegmentViewNode type="page" pagePath="page.tsx">
+                  <SegmentTrieNode>
+                  <HomePage>
+                    <div className="min-h-scre...">
+                      <header className="fixed top-...">
+                        <div>
+                        <div className="flex items...">
+                          <nav>
+                          <ThemeToggle>
+                            <div className="flex items...">
+                              <button>
+                              <button
+                                onClick={function onClick}
++                               className="p-2 rounded-full transition-all duration-200 bg-background shadow-sm text-p..."
+-                               className="p-2 rounded-full transition-all duration-200 text-muted-foreground hover:te..."
+                              >
+                              ...
+                          ...
+                      ...
+                ...
+              ...
+
+ GET / 200 in 253ms (next.js: 5ms, application-code: 248ms)
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <Suspense name="/" fallback={<Fragment>}>
+      <HTTPAccessFallbackBoundary notFound={{...}} forbidden={undefined} unauthorized={undefined}>
+        <HTTPAccessFallbackErrorBoundary pathname="/" notFound={{...}} forbidden={undefined} unauthorized={undefined} ...>
+          <RedirectBoundary>
+            <RedirectErrorBoundary router={{...}}>
+              <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+                <SegmentViewNode type="page" pagePath="page.tsx">
+                  <SegmentTrieNode>
+                  <HomePage>
+                    <div className="min-h-scre...">
+                      <header className="fixed top-...">
+                        <div>
+                        <div className="flex items...">
+                          <nav>
+                          <ThemeToggle>
+                            <div className="flex items...">
+                              <button>
+                              <button
+                                onClick={function onClick}
++                               className="p-2 rounded-full transition-all duration-200 bg-background shadow-sm text-p..."
+-                               className="p-2 rounded-full transition-all duration-200 text-muted-foreground hover:te..."
+                              >
+                              ...
+                          ...
+                      ...
+                ...
+              ...
+
+ GET /login 200 in 95ms (next.js: 44ms, application-code: 51ms)
