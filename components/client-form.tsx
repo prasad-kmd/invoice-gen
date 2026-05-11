@@ -4,96 +4,159 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient, updateClient } from "@/actions/clients";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { User, Mail, Phone, MapPin, Save, X } from "lucide-react";
 
 const clientSchema = z.object({
-	name: z.string().min(1, "Name is required"),
-	email: z.string().email().optional().or(z.literal("")),
-	phone: z.string().optional(),
-	address: z.string().optional(),
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email().optional().or(z.literal("")),
+  phone: z.string().optional(),
+  address: z.string().optional(),
 });
 
 type ClientFormValues = z.infer<typeof clientSchema>;
 
 interface ClientFormProps {
-	initialData?: any;
+  initialData?: any;
 }
 
 export function ClientForm({ initialData }: ClientFormProps) {
-	const router = useRouter();
-	const form = useForm<ClientFormValues>({
-		resolver: zodResolver(clientSchema),
-		defaultValues: initialData || {
-			name: "",
-			email: "",
-			phone: "",
-			address: "",
-		},
-	});
+  const router = useRouter();
+  const form = useForm<ClientFormValues>({
+    resolver: zodResolver(clientSchema),
+    defaultValues: initialData || {
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+    },
+  });
 
-	async function onSubmit(values: ClientFormValues) {
-		try {
-			if (initialData) {
-				await updateClient(initialData.id, values);
-				toast.success("Client updated successfully");
-			} else {
-				await createClient(values);
-				toast.success("Client created successfully");
-			}
-			router.push("/clients");
-			router.refresh();
-		} catch (error) {
-			toast.error("Something went wrong");
-		}
-	}
+  const { isSubmitting } = form.formState;
 
-	return (
-		<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-			<Card>
-				<CardHeader>
-					<CardTitle>{initialData ? "Edit Client" : "New Client"}</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-4">
-					<div className="space-y-2">
-						<label className="text-sm font-medium">Name</label>
-						<Input {...form.register("name")} placeholder="Client Name" />
-						{form.formState.errors.name && (
-							<p className="text-xs text-destructive">{form.formState.errors.name.message}</p>
-						)}
-					</div>
-					<div className="space-y-2">
-						<label className="text-sm font-medium">Email</label>
-						<Input {...form.register("email")} type="email" placeholder="client@example.com" />
-						{form.formState.errors.email && (
-							<p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
-						)}
-					</div>
-					<div className="space-y-2">
-						<label className="text-sm font-medium">Phone</label>
-						<Input {...form.register("phone")} placeholder="+1 (555) 000-0000" />
-					</div>
-					<div className="space-y-2">
-						<label className="text-sm font-medium">Address</label>
-						<textarea
-							{...form.register("address")}
-							className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-							placeholder="Client Address"
-						/>
-					</div>
-					<div className="flex justify-end gap-4">
-						<Button type="button" variant="outline" onClick={() => router.back()}>
-							Cancel
-						</Button>
-						<Button type="submit">
-							{initialData ? "Update Client" : "Create Client"}
-						</Button>
-					</div>
-				</CardContent>
-			</Card>
-		</form>
-	);
+  async function onSubmit(values: ClientFormValues) {
+    try {
+      if (initialData) {
+        await updateClient(initialData.id, values);
+        toast.success("Client updated successfully");
+      } else {
+        await createClient(values);
+        toast.success("Client created successfully");
+      }
+      router.push("/clients");
+      router.refresh();
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
+  }
+
+  return (
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="max-w-3xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700"
+    >
+      <div className="p-8 md:p-12 rounded-[3rem] border border-border/40 bg-card/60 backdrop-blur-3xl shadow-2xl">
+        <div className="flex items-start gap-4 mb-10">
+          <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+            <User className="h-6 w-6" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold mozilla-headline tracking-tight">
+              {initialData ? "Edit Client" : "New Client"}
+            </h2>
+            <p className="text-sm text-muted-foreground google-sans">
+              {initialData
+                ? "Update client contact information."
+                : "Add a new client to your database."}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-8">
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground local-jetbrains-mono ml-1 flex items-center gap-2">
+              <User className="h-3 w-3" /> Full Name
+            </label>
+            <input
+              {...form.register("name")}
+              placeholder="e.g. John Doe"
+              className="w-full h-12 px-4 rounded-xl bg-background/50 border border-border/40 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all google-sans"
+            />
+            {form.formState.errors.name && (
+              <p className="text-xs font-bold text-rose-500 mt-1 local-jetbrains-mono">
+                {form.formState.errors.name.message}
+              </p>
+            )}
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground local-jetbrains-mono ml-1 flex items-center gap-2">
+                <Mail className="h-3 w-3" /> Email Address
+              </label>
+              <input
+                {...form.register("email")}
+                type="email"
+                placeholder="john@example.com"
+                className="w-full h-12 px-4 rounded-xl bg-background/50 border border-border/40 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all google-sans"
+              />
+              {form.formState.errors.email && (
+                <p className="text-xs font-bold text-rose-500 mt-1 local-jetbrains-mono">
+                  {form.formState.errors.email.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground local-jetbrains-mono ml-1 flex items-center gap-2">
+                <Phone className="h-3 w-3" /> Phone Number
+              </label>
+              <input
+                {...form.register("phone")}
+                placeholder="+1 (555) 000-0000"
+                className="w-full h-12 px-4 rounded-xl bg-background/50 border border-border/40 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all google-sans"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground local-jetbrains-mono ml-1 flex items-center gap-2">
+              <MapPin className="h-3 w-3" /> Physical Address
+            </label>
+            <textarea
+              {...form.register("address")}
+              placeholder="Enter client's address..."
+              rows={4}
+              className="w-full p-4 rounded-xl bg-background/50 border border-border/40 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all google-sans resize-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-4 pt-4">
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => router.back()}
+          className="rounded-full h-14 px-8 font-bold google-sans border border-border/40 bg-card/50 backdrop-blur-md"
+        >
+          <X className="mr-2 h-5 w-5" />
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="rounded-full h-14 px-10 font-black uppercase tracking-widest text-sm shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95"
+        >
+          <Save className="mr-3 h-5 w-5" />
+          {isSubmitting
+            ? "Saving..."
+            : initialData
+            ? "Update Client"
+            : "Create Client"}
+        </Button>
+      </div>
+    </form>
+  );
 }
