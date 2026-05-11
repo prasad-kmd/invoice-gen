@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import localFont from "next/font/local";
 import { ViewTransitions } from "@/components/view-transitions";
 import { AccentColorInitializer } from "@/components/accent-color-initializer";
+import { ClickSpark } from "@/components/click-spark";
 
 const amoriaregular = localFont({
   src: "../public/fonts/en/AMORIARegular.woff2",
@@ -116,6 +117,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AccentColorInitializer />
+          <ClickSpark />
           <TooltipProvider>
             <ViewTransitions>
                 {children}

@@ -41,6 +41,7 @@ interface InvoiceFormProps {
 export function InvoiceForm({ userId, clients, business, initialData }: InvoiceFormProps) {
 	const router = useRouter();
 	const [showPreview, setShowPreview] = useState(false);
+	const currency = business?.currency || "LKR";
 
 	const form = useForm({
 		resolver: zodResolver(invoiceSchema),
@@ -244,22 +245,22 @@ export function InvoiceForm({ userId, clients, business, initialData }: InvoiceF
 						<div className="pt-6 border-t border-border/40 space-y-3">
 							<div className="flex justify-between text-sm google-sans">
 								<span className="text-muted-foreground">Subtotal</span>
-								<span className="font-medium">{formatCurrency(subtotal)}</span>
+								<span className="font-medium">{formatCurrency(subtotal, currency)}</span>
 							</div>
 							<div className="flex justify-between text-sm google-sans">
 								<span className="text-muted-foreground">Tax</span>
-								<span className="font-medium">{formatCurrency(taxAmount)}</span>
+								<span className="font-medium">{formatCurrency(taxAmount, currency)}</span>
 							</div>
               {watchedDiscount > 0 && (
                 <div className="flex justify-between text-sm google-sans text-rose-500">
                   <span>Discount</span>
-                  <span>-{formatCurrency(watchedDiscount)}</span>
+                  <span>-{formatCurrency(watchedDiscount, currency)}</span>
                 </div>
               )}
 							<div className="flex justify-between items-end pt-2">
 								<span className="text-sm font-bold uppercase tracking-widest mozilla-headline">Total</span>
 								<span className="text-3xl font-black mozilla-headline tracking-tighter text-primary">
-                  {formatCurrency(total)}
+                  {formatCurrency(total, currency)}
                 </span>
 							</div>
 						</div>

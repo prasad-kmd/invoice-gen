@@ -6,9 +6,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { User, Mail, Phone, MapPin, Receipt, ArrowRight, FileEdit, ArrowLeft } from "lucide-react";
 
+import { getSettings } from "@/actions/settings";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+
 export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const id = (await params).id;
 	const client = await getClientById(id);
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+    const settings = await getSettings(session?.user.id!);
+    const currency = settings?.currency || "LKR";
 
 	if (!client) {
 		notFound();
@@ -89,7 +98,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                                 Total Spent
                             </p>
                             <p className="text-3xl font-black mozilla-headline tracking-tighter text-primary">
-                                {formatCurrency(totalSpent)}
+                                {formatCurrency(totalSpent, currency)}
                             </p>
                         </div>
                     </div>
@@ -154,7 +163,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                                                 </span>
                                             </td>
                                             <td className="px-8 py-4 text-right font-bold local-jetbrains-mono text-sm">
-                                                {formatCurrency(invoice.totalAmount)}
+                                                {formatCurrency(invoice.totalAmount, currency)}
                                             </td>
                                             <td className="px-8 py-4 text-right">
                                                 <Link

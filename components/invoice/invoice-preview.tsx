@@ -10,6 +10,8 @@ interface InvoicePreviewProps {
 }
 
 export function InvoicePreview({ business, client, invoice }: InvoicePreviewProps) {
+	const currency = business?.currency || "LKR";
+
 	return (
 		<Card className="mx-auto w-full max-w-4xl bg-white text-black shadow-lg">
 			<CardContent className="p-12">
@@ -61,9 +63,9 @@ export function InvoicePreview({ business, client, invoice }: InvoicePreviewProp
 									<TableCell>{index + 1}</TableCell>
 									<TableCell className="font-medium">{item.description}</TableCell>
 									<TableCell className="text-center">{item.quantity}</TableCell>
-									<TableCell className="text-right">{formatCurrency(item.unitPrice)}</TableCell>
+									<TableCell className="text-right">{formatCurrency(item.unitPrice, currency)}</TableCell>
 									<TableCell className="text-right font-semibold">
-										{formatCurrency(item.quantity * item.unitPrice)}
+										{formatCurrency(item.quantity * item.unitPrice, currency)}
 									</TableCell>
 								</TableRow>
 							))}
@@ -75,21 +77,21 @@ export function InvoicePreview({ business, client, invoice }: InvoicePreviewProp
 					<div className="w-64 space-y-3">
 						<div className="flex justify-between text-sm">
 							<span className="text-muted-foreground">Subtotal:</span>
-							<span>{formatCurrency(invoice.subtotal || 0)}</span>
+							<span>{formatCurrency(invoice.subtotal || 0, currency)}</span>
 						</div>
 						{invoice.discountAmount > 0 && (
 							<div className="flex justify-between text-sm text-destructive">
 								<span>Discount:</span>
-								<span>-{formatCurrency(invoice.discountAmount)}</span>
+								<span>-{formatCurrency(invoice.discountAmount, currency)}</span>
 							</div>
 						)}
 						<div className="flex justify-between text-sm">
 							<span className="text-muted-foreground">Tax ({invoice.taxRate}%):</span>
-							<span>{formatCurrency(invoice.taxAmount || 0)}</span>
+							<span>{formatCurrency(invoice.taxAmount || 0, currency)}</span>
 						</div>
 						<div className="flex justify-between border-t pt-3 text-lg font-bold">
 							<span>Total:</span>
-							<span className="text-primary">{formatCurrency(invoice.totalAmount || 0)}</span>
+							<span className="text-primary">{formatCurrency(invoice.totalAmount || 0, currency)}</span>
 						</div>
 					</div>
 				</div>

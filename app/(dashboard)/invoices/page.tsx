@@ -6,11 +6,21 @@ import { formatCurrency, formatDate, cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
+import { getSettings } from "@/actions/settings";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+
 export default async function InvoicesPage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string; status?: string }>;
 }) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const settings = await getSettings(session?.user.id!);
+  const currency = settings?.currency || "LKR";
+
   const params = await searchParams;
   const invoicesList = await getInvoices({
     q: params.q,
@@ -124,7 +134,7 @@ export default async function InvoicesPage({
                                 Total Amount
                             </p>
                             <p className="text-xl font-bold local-jetbrains-mono">
-                                {formatCurrency(invoice.totalAmount)}
+                                {formatCurrency(invoice.totalAmount, currency)}
                             </p>
                         </div>
                         <div className="flex gap-2">

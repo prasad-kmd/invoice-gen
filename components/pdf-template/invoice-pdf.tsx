@@ -132,6 +132,8 @@ const styles = StyleSheet.create({
 });
 
 export function InvoicePDF({ business, client, invoice }: any) {
+	const currency = business?.currency || "LKR";
+
 	return (
 		<Document>
 			<Page size="A4" style={styles.page}>
@@ -176,8 +178,8 @@ export function InvoicePDF({ business, client, invoice }: any) {
 							<Text style={styles.col1}>{index + 1}</Text>
 							<Text style={styles.col2}>{item.description}</Text>
 							<Text style={styles.col3}>{item.quantity}</Text>
-							<Text style={styles.col4}>{formatCurrency(item.unitPrice)}</Text>
-							<Text style={[styles.col5, { fontWeight: "bold" }]}>{formatCurrency(item.totalPrice)}</Text>
+							<Text style={styles.col4}>{formatCurrency(item.unitPrice, currency)}</Text>
+							<Text style={[styles.col5, { fontWeight: "bold" }]}>{formatCurrency(item.totalPrice, currency)}</Text>
 						</View>
 					))}
 				</View>
@@ -186,21 +188,21 @@ export function InvoicePDF({ business, client, invoice }: any) {
 					<View style={styles.summaryBox}>
 						<View style={styles.summaryRow}>
 							<Text style={{ color: "#666" }}>Subtotal:</Text>
-							<Text>{formatCurrency(invoice.subtotal)}</Text>
+							<Text>{formatCurrency(invoice.subtotal, currency)}</Text>
 						</View>
 						{invoice.discountAmount > 0 && (
 							<View style={styles.summaryRow}>
 								<Text style={{ color: "#dc2626" }}>Discount:</Text>
-								<Text style={{ color: "#dc2626" }}>-{formatCurrency(invoice.discountAmount)}</Text>
+								<Text style={{ color: "#dc2626" }}>-{formatCurrency(invoice.discountAmount, currency)}</Text>
 							</View>
 						)}
 						<View style={styles.summaryRow}>
 							<Text style={{ color: "#666" }}>Tax ({invoice.taxRate}%):</Text>
-							<Text>{formatCurrency(invoice.taxAmount)}</Text>
+							<Text>{formatCurrency(invoice.taxAmount, currency)}</Text>
 						</View>
 						<View style={styles.totalRow}>
 							<Text style={styles.totalLabel}>Total:</Text>
-							<Text style={styles.totalValue}>{formatCurrency(invoice.totalAmount)}</Text>
+							<Text style={styles.totalValue}>{formatCurrency(invoice.totalAmount, currency)}</Text>
 						</View>
 					</View>
 				</View>
