@@ -1,105 +1,172 @@
 import { getDashboardStats, getRecentInvoices } from "@/actions/dashboard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import {
+  ReceiptText,
+  Users,
+  TrendingUp,
+  AlertCircle,
+  ArrowUpRight,
+  Clock,
+  CheckCircle2,
+} from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-	const stats = await getDashboardStats();
-	const recentInvoices = await getRecentInvoices();
+  const stats = await getDashboardStats();
+  const recentInvoices = await getRecentInvoices();
 
-	return (
-		<div className="space-y-8">
-			<h1 className="text-3xl font-bold">Dashboard</h1>
+  const statCards = [
+    {
+      title: "Total Invoices",
+      value: stats.totalInvoices,
+      icon: ReceiptText,
+      color: "text-blue-500",
+      bg: "bg-blue-500/10",
+    },
+    {
+      title: "Amount Paid",
+      value: formatCurrency(stats.amountPaid),
+      icon: CheckCircle2,
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
+    },
+    {
+      title: "Outstanding",
+      value: formatCurrency(stats.outstanding),
+      icon: Clock,
+      color: "text-amber-500",
+      bg: "bg-amber-500/10",
+    },
+    {
+      title: "Overdue",
+      value: formatCurrency(stats.overdue),
+      icon: AlertCircle,
+      color: "text-rose-500",
+      bg: "bg-rose-500/10",
+    },
+  ];
 
-			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">Total Invoices</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-bold">{stats.totalInvoices}</div>
-					</CardContent>
-				</Card>
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">Amount Paid</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-bold">{formatCurrency(stats.amountPaid)}</div>
-					</CardContent>
-				</Card>
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">Outstanding</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-bold">{formatCurrency(stats.outstanding)}</div>
-					</CardContent>
-				</Card>
-				<Card>
-					<CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-						<CardTitle className="text-sm font-medium">Overdue</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-bold">{formatCurrency(stats.overdue)}</div>
-					</CardContent>
-				</Card>
-			</div>
+  return (
+    <div className="space-y-10 py-8 animate-in fade-in duration-700">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-4xl md:text-5xl font-black mozilla-headline tracking-tight">
+          Dashboard
+        </h1>
+        <p className="text-muted-foreground google-sans">
+          Overview of your repair business performance.
+        </p>
+      </div>
 
-			<Card>
-				<CardHeader>
-					<CardTitle>Recent Invoices</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead>Invoice #</TableHead>
-								<TableHead>Client</TableHead>
-								<TableHead>Date</TableHead>
-								<TableHead>Status</TableHead>
-								<TableHead className="text-right">Amount</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{recentInvoices.length === 0 ? (
-								<TableRow>
-									<TableCell colSpan={5} className="h-24 text-center">
-										No invoices found.
-									</TableCell>
-								</TableRow>
-							) : (
-								recentInvoices.map((invoice) => (
-									<TableRow key={invoice.id}>
-										<TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
-										<TableCell>{invoice.clientName}</TableCell>
-										<TableCell>{formatDate(invoice.issueDate)}</TableCell>
-										<TableCell>
-											<Badge
-												variant={
-													invoice.status === "paid"
-														? "success"
-														: invoice.status === "overdue"
-															? "destructive"
-															: invoice.status === "sent"
-																? "warning"
-																: "secondary"
-												}
-											>
-												{invoice.status}
-											</Badge>
-										</TableCell>
-										<TableCell className="text-right">{formatCurrency(invoice.totalAmount)}</TableCell>
-									</TableRow>
-								))
-							)}
-						</TableBody>
-					</Table>
-				</CardContent>
-			</Card>
-		</div>
-	);
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {statCards.map((stat, i) => (
+          <div
+            key={stat.title}
+            className="group relative p-6 rounded-[2rem] border border-border/40 bg-card/80 backdrop-blur-3xl shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/40"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className={cn("p-3 rounded-2xl", stat.bg)}>
+                <stat.icon className={cn("h-6 w-6", stat.color)} />
+              </div>
+              <TrendingUp className="h-4 w-4 text-muted-foreground/30" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground local-jetbrains-mono">
+                {stat.title}
+              </p>
+              <p className="text-3xl font-bold mozilla-headline tracking-tighter">
+                {stat.value}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="relative group">
+        <div className="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
+        <div className="relative rounded-[3rem] border border-border/40 bg-card/80 backdrop-blur-3xl shadow-2xl overflow-hidden min-h-[400px]">
+          <div className="p-8 border-b border-border/40 flex items-center justify-between">
+            <h2 className="text-2xl font-bold mozilla-headline tracking-tight flex items-center gap-3">
+              <ReceiptText className="h-6 w-6 text-primary" />
+              Recent Invoices
+            </h2>
+            <Link
+              href="/invoices"
+              className="group flex items-center text-sm font-bold text-primary hover:opacity-80 transition-opacity google-sans uppercase tracking-widest"
+            >
+              View All
+              <ArrowUpRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </Link>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-muted/30">
+                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground local-jetbrains-mono">
+                    Invoice #
+                  </th>
+                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground local-jetbrains-mono">
+                    Client
+                  </th>
+                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground local-jetbrains-mono">
+                    Date
+                  </th>
+                  <th className="px-8 py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground local-jetbrains-mono">
+                    Status
+                  </th>
+                  <th className="px-8 py-4 text-right text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground local-jetbrains-mono">
+                    Amount
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/40">
+                {recentInvoices.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="h-32 text-center text-muted-foreground google-sans">
+                      No invoices found.
+                    </td>
+                  </tr>
+                ) : (
+                  recentInvoices.map((invoice) => (
+                    <tr
+                      key={invoice.id}
+                      className="group/row hover:bg-muted/20 transition-colors"
+                    >
+                      <td className="px-8 py-4 font-bold local-jetbrains-mono text-sm">
+                        {invoice.invoiceNumber}
+                      </td>
+                      <td className="px-8 py-4 google-sans text-sm font-medium">
+                        {invoice.clientName}
+                      </td>
+                      <td className="px-8 py-4 text-muted-foreground google-sans text-sm">
+                        {formatDate(invoice.issueDate)}
+                      </td>
+                      <td className="px-8 py-4">
+                        <span
+                          className={cn(
+                            "inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border",
+                            invoice.status === "paid" && "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+                            invoice.status === "overdue" && "bg-rose-500/10 text-rose-500 border-rose-500/20",
+                            invoice.status === "sent" && "bg-blue-500/10 text-blue-500 border-blue-500/20",
+                            invoice.status === "draft" && "bg-muted/10 text-muted-foreground border-muted/20"
+                          )}
+                        >
+                          {invoice.status}
+                        </span>
+                      </td>
+                      <td className="px-8 py-4 text-right font-bold local-jetbrains-mono text-sm">
+                        {formatCurrency(invoice.totalAmount)}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

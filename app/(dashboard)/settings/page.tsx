@@ -17,11 +17,15 @@ export default async function SettingsPage() {
 	const settings = await getSettings(adminUser.id);
 
 	return (
-		<div className="mx-auto max-w-4xl space-y-8">
-			<div>
-				<h1 className="text-3xl font-bold">Settings</h1>
-				<p className="text-muted-foreground">Configure your business profile and invoice defaults.</p>
-			</div>
+		<div className="max-w-5xl mx-auto space-y-10 py-8 animate-in fade-in duration-700">
+            <div className="space-y-2">
+                <h1 className="text-4xl md:text-5xl font-black mozilla-headline tracking-tight">
+                    Settings
+                </h1>
+                <p className="text-muted-foreground google-sans">
+                    Configure your business profile and invoice defaults.
+                </p>
+            </div>
 
 			<SettingsForm userId={adminUser.id} initialData={settings} />
 		</div>
